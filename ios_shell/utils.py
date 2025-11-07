@@ -50,6 +50,11 @@ def format_string(format: str, kind: str, width: int, decimals: int) -> str:
         return f"A{len(fortrantype)+1}"
     elif fortrantype in ["' '", "NQ"]:
         return f"A{width}"
+    elif fortrantype in ["D"]:
+        if datatype in ["I"]:
+            return f"I{width}"
+        else:
+            return f"D{width}.{decimals}"
     else:
         return fortrantype
 
