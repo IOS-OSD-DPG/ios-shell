@@ -27,6 +27,7 @@ pandas = {version = "^1.4.2", optional = true}
 numpy = "<2.0"
 
 
+
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
 mypy = "^0.910"
