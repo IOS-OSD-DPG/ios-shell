@@ -24,6 +24,8 @@ include = [
 python = ">=3.8,<3.11"
 fortranformat = "^1.0.1"
 pandas = {version = "^1.4.2", optional = true}
+numpy = "<2.0"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
