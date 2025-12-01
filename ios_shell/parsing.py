@@ -292,7 +292,7 @@ def get_history(contents: List[str]) -> Tuple[sections.History, List[str]]:
     """Parse the \\*HISTORY section"""
     history_dict, rest = get_section(contents, "history")
     programs = (
-        [sections.Program(*elem) for elem in history_dict[PROGRAMS]]
+        [sections.Program(*elem.values()) for elem in history_dict[PROGRAMS]]
         if PROGRAMS in history_dict
         else []
     )
