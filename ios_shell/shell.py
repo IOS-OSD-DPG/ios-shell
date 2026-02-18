@@ -37,8 +37,15 @@ class ShellFile:
     @classmethod
     def fromfile(cls, filename, process_data=True):  # pragma: no mutate
         """Construct a ShellFile object from the contents of a file."""
-        with open(filename, "r", encoding="ASCII", errors="ignore") as f:
-            contents = f.read()
+        # with open(filename, "r", encoding="ASCII", errors="ignore") as f:
+        #     contents = f.read()
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                contents = f.read()
+        except UnicodeDecodeError:
+            with open(filename, "r", encoding="ANSI") as f:
+                contents = f.read()
+
         try:
             return ShellFile.fromcontents(contents, process_data, filename=filename)
         except ValueError as e:
