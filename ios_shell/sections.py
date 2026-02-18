@@ -42,8 +42,12 @@ class Channel:
             minimum = "0"
         if maximum.strip().upper() == "O":
             maximum = "0"
-        self.minimum = float(minimum) if minimum.strip() not in EMPTY else NAN
-        self.maximum = float(maximum) if maximum.strip() not in EMPTY else NAN
+
+        #self.minimum = float(minimum) if minimum.strip() not in EMPTY else NAN
+        #self.maximum = float(maximum) if maximum.strip() not in EMPTY else NAN
+
+        self.minimum = (NAN if minimum.strip() in EMPTY or "/" in minimum.strip() or ":" in minimum.strip()  else float(minimum))
+        self.maximum = (NAN if maximum.strip() in EMPTY or "/" in maximum.strip()  or ":" in maximum.strip()  else float(maximum))
 
 
 class ChannelDetail:

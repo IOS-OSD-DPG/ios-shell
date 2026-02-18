@@ -41,6 +41,7 @@ def format_string(format: str, kind: str, width: int, decimals: int) -> str:
     elif fortrantype in ["I"]:
         return f"I{width}"
     elif fortrantype.upper() in [
+        "DD/MM/YYYY",
         "YYYY/MM/DD",
         "YYYY-MM-DD",
         "HH:MM",

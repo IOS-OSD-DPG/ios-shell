@@ -413,6 +413,55 @@ def _postprocess_line(line: List[Any]) -> List[Any]:
     return [_process_item(item) for item in line]
 
 
+
+def handle_DMH_in_Data(lines: str, format: str):
+    fmt = format.strip("()")
+    fmt_list = [f.strip() for f in fmt.split(",")]
+
+    # Use DMH position from the format list to remove character before and after each line
+    dmh_indices = [i for i, f in enumerate(fmt_list) if f == "DMH"]
+    first_dmh = dmh_indices[0]
+    last_dmh = dmh_indices[-1]
+
+    width_before = sum(int(re.search(r"\d+", f).group()) if re.search(r"\d+", f) else 0
+                       for f in fmt_list[:first_dmh])
+    width_after = sum(int(re.search(r"\d+", f).group()) if re.search(r"\d+", f) else 0
+                      for f in fmt_list[last_dmh + 1:])
+
+    new_lines = []
+    for line in lines:
+        dmh_block = line[width_before: len(line) - width_after]
+        pattern = r"(\d+)\s+([\d.]+)\s*([NSEW])"
+        matches = re.findall(pattern, dmh_block)
+
+        if len(matches) != 2:
+            new_lines.append(line) # keep line unchanged if DMH parsing fails
+            continue
+
+        lat = lon = None
+        for deg, minute, hemi in matches:
+            value = float(deg) + float(minute) / 60.0
+            if hemi in ("S", "W"):
+                value = -value
+
+            if hemi in ("N", "S"):
+                lat = value
+            else:
+                lon = value
+
+        new_line = (
+                line[:width_before]
+                + f"{lat:11.4f}{lon:11.4f}"
+                + line[len(line) - width_after:])
+
+        new_lines.append(new_line)
+
+    format = format.replace("DMH", "F11.4")
+
+    return new_lines, format
+
+
+
 def get_data(contents: str, format: str, records: int) -> Tuple[List[List[Any]], str]:
     """Process the data in the file"""
     lines = contents.splitlines()
@@ -420,6 +469,10 @@ def get_data(contents: str, format: str, records: int) -> Tuple[List[List[Any]],
         lines.remove("")
     if len(lines) < records:
         raise ValueError(f"Insufficient data for requested number of records")
+
+    if "DMH" in format:
+        lines, format = handle_DMH_in_Data(lines, format)
+
     reader = ff.FortranRecordReader(format)
     data = [_postprocess_line(reader.read(line)) for line in lines[:records]]
     rest = "\n".join(lines[records:])  # pragma: no mutate
